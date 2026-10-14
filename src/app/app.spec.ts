@@ -35,7 +35,7 @@ describe('App - AURA Launcher', () => {
     );
 
     expect(links).toContain('https://aura-corporativa.vercel.app');
-    expect(links).toContain('https://aura-ops.vercel.app');
+    expect(links).toContain('https://aura-ops-five.vercel.app');
     expect(links).toContain('https://aura-employee.vercel.app');
   });
 });

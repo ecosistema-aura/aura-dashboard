@@ -28,7 +28,7 @@ export class App {
       name: 'AURA Ops',
       tag: 'Gestión Operacional',
       description: 'Centro de control de operaciones, tareas, solicitudes y aprobaciones.',
-      url: 'https://aura-ops.vercel.app',
+      url: 'https://aura-ops-five.vercel.app',
       icon: 'activity',
       tone: 'blue',
     },
