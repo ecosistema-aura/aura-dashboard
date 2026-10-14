@@ -1,7 +1,7 @@
 import { TestBed } from '@angular/core/testing';
 import { App } from './app';
 
-describe('App - AURA Launcher', () => {
+describe('App - Minimal Route Launcher', () => {
   beforeEach(async () => {
     await TestBed.configureTestingModule({
       imports: [App],
@@ -14,28 +14,30 @@ describe('App - AURA Launcher', () => {
     expect(app).toBeTruthy();
   });
 
-  it('should render the ecosystem launcher with access cards', async () => {
+  it('should render brand and route buttons', async () => {
     const fixture = TestBed.createComponent(App);
     await fixture.whenStable();
     const compiled = fixture.nativeElement as HTMLElement;
 
-    expect(compiled.querySelector('.brand-title')?.textContent).toContain('AURA');
+    expect(compiled.querySelector('h1')?.textContent).toContain('AURA');
+    const links = Array.from(compiled.querySelectorAll<HTMLAnchorElement>('.route-btn'));
+    expect(links.length).toBe(3);
     expect(compiled.textContent).toContain('AURA Corporativa');
     expect(compiled.textContent).toContain('AURA Ops');
     expect(compiled.textContent).toContain('AURA Employee');
   });
 
-  it('should have direct URLs to the applications', async () => {
+  it('should link to correct app URLs', async () => {
     const fixture = TestBed.createComponent(App);
     await fixture.whenStable();
     const compiled = fixture.nativeElement as HTMLElement;
 
-    const links = Array.from(compiled.querySelectorAll<HTMLAnchorElement>('.app-card')).map(
+    const urls = Array.from(compiled.querySelectorAll<HTMLAnchorElement>('.route-btn')).map(
       (a) => a.getAttribute('href')
     );
 
-    expect(links).toContain('https://aura-corporativa.vercel.app');
-    expect(links).toContain('https://aura-ops-five.vercel.app');
-    expect(links).toContain('https://aura-employee.vercel.app');
+    expect(urls).toContain('https://aura-corporativa.vercel.app');
+    expect(urls).toContain('https://aura-ops-five.vercel.app');
+    expect(urls).toContain('https://aura-employee.vercel.app');
   });
 });

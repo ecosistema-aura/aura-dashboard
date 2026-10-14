@@ -1,44 +1,18 @@
-<svg class="icon-sprite" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" style="display: none;">
-  <symbol id="i-globe" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></symbol>
-  <symbol id="i-activity" viewBox="0 0 24 24"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></symbol>
-  <symbol id="i-users" viewBox="0 0 24 24"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></symbol>
-  <symbol id="i-arrow-up-right" viewBox="0 0 24 24"><line x1="7" y1="17" x2="17" y2="7"/><polyline points="7 7 17 7 17 17"/></symbol>
-</svg>
-
-<main class="launcher-container">
-  <header class="launcher-header">
-    <img class="brand-logo" src="/logo_aura_mini.jpg" alt="Logo AURA">
-    <h1 class="brand-title">AURA<span>ecosistema</span></h1>
-    <p class="brand-subtitle">Selecciona una aplicación para acceder</p>
+<main class="launcher">
+  <header class="brand">
+    <img src="/logo_aura_mini.jpg" alt="Logo AURA" class="logo">
+    <h1>AURA</h1>
   </header>
 
-  <div class="apps-grid">
-    @for (app of apps; track app.name) {
-      <a
-        [href]="app.url"
-        target="_blank"
-        rel="noopener noreferrer"
-        class="app-card"
-        [class]="'tone-' + app.tone"
-      >
-        <div class="card-icon-wrap">
-          <svg class="icon app-icon"><use [attr.href]="'#i-' + app.icon"/></svg>
-        </div>
-        <div class="card-content">
-          <div class="card-heading">
-            <h2>{{ app.name }}</h2>
-            <span class="card-tag">{{ app.tag }}</span>
-          </div>
-          <p class="card-description">{{ app.description }}</p>
-        </div>
-        <div class="card-arrow">
-          <svg class="icon arrow-icon"><use href="#i-arrow-up-right"/></svg>
-        </div>
+  <nav class="routes" aria-label="Aplicaciones del ecosistema">
+    @for (item of links; track item.name) {
+      <a [href]="item.url" target="_blank" rel="noopener noreferrer" class="route-btn">
+        <span>{{ item.name }}</span>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" class="arrow" aria-hidden="true">
+          <line x1="7" y1="17" x2="17" y2="7"></line>
+          <polyline points="7 7 17 7 17 17"></polyline>
+        </svg>
       </a>
     }
-  </div>
-
-  <footer class="launcher-footer">
-    <span>Ecosistema AURA</span>
-  </footer>
+  </nav>
 </main>
