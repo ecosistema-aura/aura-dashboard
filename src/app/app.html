@@ -1,18 +1,44 @@
 <main class="launcher">
   <header class="brand">
-    <img src="/logo_aura_mini.jpg" alt="Logo AURA" class="logo">
-    <h1>AURA</h1>
+    <img src="/logo_aura_mini.jpg" alt="Logo AURA" class="brand-logo">
+    <div class="brand-text">
+      <h1>AURA</h1>
+      <p>Directorio del Ecosistema</p>
+    </div>
   </header>
 
-  <nav class="routes" aria-label="Aplicaciones del ecosistema">
-    @for (item of links; track item.name) {
-      <a [href]="item.url" target="_blank" rel="noopener noreferrer" class="route-btn">
-        <span>{{ item.name }}</span>
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" class="arrow" aria-hidden="true">
-          <line x1="7" y1="17" x2="17" y2="7"></line>
-          <polyline points="7 7 17 7 17 17"></polyline>
-        </svg>
+  <section class="cards-grid" aria-label="Aplicaciones del ecosistema">
+    @for (app of apps; track app.name) {
+      <a
+        [href]="app.url"
+        target="_blank"
+        rel="noopener noreferrer"
+        class="site-card"
+      >
+        <div class="card-image-wrap">
+          <img [src]="app.image" [alt]="app.name" class="card-img" loading="lazy">
+          <span class="card-tag">{{ app.tag }}</span>
+        </div>
+
+        <div class="card-body">
+          <div class="card-title-row">
+            <h2>{{ app.name }}</h2>
+          </div>
+          <p class="card-desc">{{ app.description }}</p>
+
+          <div class="card-action">
+            <span>Acceder</span>
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" class="arrow-icon" aria-hidden="true">
+              <line x1="7" y1="17" x2="17" y2="7"></line>
+              <polyline points="7 7 17 7 17 17"></polyline>
+            </svg>
+          </div>
+        </div>
       </a>
     }
-  </nav>
+  </section>
+
+  <footer class="footer">
+    <span>Ecosistema AURA</span>
+  </footer>
 </main>
