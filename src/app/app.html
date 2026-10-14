@@ -1,8 +1,33 @@
+@if (showIntro()) {
+  <aside class="intro-overlay" [class.fade-out]="isIntroFading()" aria-label="Pantalla de bienvenida">
+    <div class="intro-content">
+      <!-- Tarjeta de pedestal blanca para el logo oficial con halo rojo idéntico a Nosotros -->
+      <div class="intro-pedestal-wrap">
+        <div class="intro-halo" aria-hidden="true"></div>
+        <div class="intro-pedestal">
+          <img src="/logo_aura.jpg" alt="AURA Logo Oficial" class="intro-logo">
+        </div>
+      </div>
+
+      <!-- Texto de Bienvenida -->
+      <div class="intro-text">
+        <span class="intro-badge">ECOSISTEMA AURA</span>
+        <h1 class="intro-title">Bienvenido a AURA Directorio</h1>
+      </div>
+
+      <!-- Barra de progreso de 3 segundos -->
+      <div class="intro-progress-bar" aria-hidden="true">
+        <div class="intro-progress-fill"></div>
+      </div>
+    </div>
+  </aside>
+}
+
 <main class="launcher">
   <header class="brand">
     <img src="/logo_aura_mini.jpg" alt="Logo AURA" class="brand-logo">
     <div class="brand-text">
-      <h1>AURA</h1>
+      <h2>AURA</h2>
       <p>Directorio del Ecosistema</p>
     </div>
   </header>
@@ -22,7 +47,7 @@
 
         <div class="card-body">
           <div class="card-title-row">
-            <h2>{{ app.name }}</h2>
+            <h3>{{ app.name }}</h3>
           </div>
           <p class="card-desc">{{ app.description }}</p>
 

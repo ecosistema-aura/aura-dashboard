@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, OnInit, signal } from '@angular/core';
 
 export interface EcosystemApp {
   name: string;
@@ -13,7 +13,10 @@ export interface EcosystemApp {
   templateUrl: './app.html',
   styleUrl: './app.css',
 })
-export class App {
+export class App implements OnInit {
+  protected readonly showIntro = signal<boolean>(true);
+  protected readonly isIntroFading = signal<boolean>(false);
+
   protected readonly apps: EcosystemApp[] = [
     {
       name: 'AURA Corporativa',
@@ -37,4 +40,14 @@ export class App {
       image: '/app-employee.png',
     },
   ];
+
+  ngOnInit(): void {
+    setTimeout(() => {
+      this.isIntroFading.set(true);
+    }, 2500);
+
+    setTimeout(() => {
+      this.showIntro.set(false);
+    }, 3100);
+  }
 }
