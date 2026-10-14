@@ -3,9 +3,9 @@ import { vi } from 'vitest';
 import { App } from './app';
 import { demoAdminCredentials } from './demo-credentials';
 
-describe('App', () => {
+describe('App - AURA Ecosystem Hub', () => {
   beforeEach(async () => {
-    sessionStorage.setItem('aura.session', JSON.stringify({ name: 'Andre Zapata', email: 'admin@aura.local' }));
+    sessionStorage.setItem('aura.session', JSON.stringify({ name: 'Andre Zapata', email: 'admin@aura.local', role: 'Administrador' }));
     await TestBed.configureTestingModule({
       imports: [App],
     }).compileComponents();
@@ -13,6 +13,8 @@ describe('App', () => {
 
   afterEach(() => {
     sessionStorage.removeItem('aura.session');
+    localStorage.removeItem('aura.hub.custom_apps');
+    localStorage.removeItem('aura.hub.env');
   });
 
   it('should create the app', () => {
@@ -21,39 +23,95 @@ describe('App', () => {
     expect(app).toBeTruthy();
   });
 
-  it('should render the AURA Gestión de Operaciones dashboard', async () => {
+  it('should render the AURA Ecosystem directory and applications', async () => {
     const fixture = TestBed.createComponent(App);
     await fixture.whenStable();
     const compiled = fixture.nativeElement as HTMLElement;
-    expect(compiled.querySelector('.brand-name')?.textContent).toContain('AURA');
-    expect(compiled.querySelector('.workspace-avatar')?.getAttribute('src')).toBe('/aura-logo.svg');
-    expect(compiled.querySelector('.dashboard-date')?.textContent?.trim()).toContain(
-      new Intl.DateTimeFormat('es-ES', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' })
-        .format(new Date())
-        .toLocaleLowerCase('es'),
-    );
-    expect(compiled.querySelector('.dashboard-footer a')?.getAttribute('href')).toBe('#dashboard');
-    expect(compiled.querySelector('h1')?.textContent).toContain('Buenos días, Andre');
-    expect(compiled.textContent).toContain('Tareas activas');
-    expect(compiled.textContent).toContain('Seguimiento de Procesos Internos');
-    expect(compiled.textContent).toContain('Aprobaciones pendientes');
+
+    expect(compiled.querySelector('.brand-title')?.textContent).toContain('AURAHUB');
+    expect(compiled.querySelector('h1')?.textContent).toContain('Portal del Ecosistema AURA');
+    expect(compiled.textContent).toContain('AURA Corporativa');
+    expect(compiled.textContent).toContain('AURA Ops');
+    expect(compiled.textContent).toContain('AURA Employee');
+    expect(compiled.textContent).toContain('AURA Cloud & Supabase');
   });
 
-  it('should advance process steps in the live process monitor ("siguele los pasos al monitor")', async () => {
+  it('should switch between Cloud (Production) and Localhost environments', async () => {
     const fixture = TestBed.createComponent(App);
     await fixture.whenStable();
     const compiled = fixture.nativeElement as HTMLElement;
 
-    const initialProgress = compiled.querySelector('.proc-progress-badge strong')?.textContent?.trim();
-    expect(initialProgress).toBe('60%');
+    // Default is prod
+    expect(compiled.textContent).toContain('https://aura-corporativa.vercel.app');
 
-    // Click advance button
-    const advanceBtn = compiled.querySelector<HTMLButtonElement>('.advance-btn');
-    advanceBtn?.click();
+    // Click local button
+    const localBtn = compiled.querySelectorAll<HTMLButtonElement>('.env-button')[1];
+    localBtn.click();
     fixture.detectChanges();
 
-    const newProgress = compiled.querySelector('.proc-progress-badge strong')?.textContent?.trim();
-    expect(newProgress).toBe('80%');
+    expect(compiled.textContent).toContain('http://localhost:5173');
+    expect(compiled.textContent).toContain('http://localhost:4200');
+    expect(compiled.textContent).toContain('http://localhost:4201');
+  });
+
+  it('should filter applications by category and search term', async () => {
+    const fixture = TestBed.createComponent(App);
+    await fixture.whenStable();
+    const compiled = fixture.nativeElement as HTMLElement;
+
+    // Filter by Operaciones category tab
+    const tabs = compiled.querySelectorAll<HTMLButtonElement>('.tab-button');
+    const opsTab = Array.from(tabs).find((t) => t.textContent?.includes('Operaciones'));
+    opsTab?.click();
+    fixture.detectChanges();
+
+    expect(compiled.textContent).toContain('AURA Ops');
+    expect(compiled.textContent).not.toContain('AURA Corporativa');
+
+    // Search query
+    const searchInput = compiled.querySelector<HTMLInputElement>('.search-box input')!;
+    searchInput.value = 'Employee';
+    searchInput.dispatchEvent(new Event('input'));
+    fixture.detectChanges();
+
+    // Since category is Operaciones, Employee won't show
+    expect(compiled.querySelector('.empty-state')).not.toBeNull();
+
+    // Reset to Todas las Apps
+    const allTab = Array.from(tabs).find((t) => t.textContent?.includes('Todas'));
+    allTab?.click();
+    fixture.detectChanges();
+
+    expect(compiled.textContent).toContain('AURA Employee');
+  });
+
+  it('should allow adding and removing custom apps in directory', async () => {
+    const fixture = TestBed.createComponent(App);
+    await fixture.whenStable();
+    const app = fixture.componentInstance;
+    const compiled = fixture.nativeElement as HTMLElement;
+
+    // Open add app modal
+    compiled.querySelector<HTMLButtonElement>('.add-app-button')?.click();
+    fixture.detectChanges();
+
+    expect(compiled.querySelector('.modal-dialog')).not.toBeNull();
+
+    // Fill form and save via component
+    (app as any).newAppName = 'AURA Analytics';
+    (app as any).newAppUrlProd = 'https://analytics.aura.com';
+    (app as any).saveCustomApp();
+    fixture.detectChanges();
+
+    expect(compiled.textContent).toContain('AURA Analytics');
+
+    // Delete custom app
+    vi.spyOn(window, 'confirm').mockReturnValue(true);
+    const deleteBtn = compiled.querySelector<HTMLButtonElement>('.delete-app-btn');
+    deleteBtn?.click();
+    fixture.detectChanges();
+
+    expect(Array.from(compiled.querySelectorAll('.app-card h3')).map(h => h.textContent)).not.toContain('AURA Analytics');
   });
 
   it('should keep only email-based sign-in and registration options', async () => {
@@ -123,71 +181,11 @@ describe('App', () => {
 
     expect(compiled.querySelector('.signout-overlay')).not.toBeNull();
     expect(compiled.querySelector('.auth-screen')).toBeNull();
-    await vi.advanceTimersByTimeAsync(2000);
+    await vi.advanceTimersByTimeAsync(1600);
     fixture.detectChanges();
     vi.useRealTimers();
 
     expect(compiled.querySelector('.signout-overlay')).toBeNull();
     expect(compiled.querySelector('.auth-screen')).not.toBeNull();
-  });
-
-  it('should show module-specific fields in operational creation modals', async () => {
-    const fixture = TestBed.createComponent(App);
-    await fixture.whenStable();
-    const compiled = fixture.nativeElement as HTMLElement;
-    const modules = [
-      { name: 'Tareas', title: 'Nueva tarea', fields: ['title', 'assignee', 'department', 'priority'] },
-      { name: 'Responsables', title: 'Nuevo responsable', fields: ['title', 'role', 'department', 'email'] },
-      { name: 'Solicitudes', title: 'Nueva solicitud', fields: ['title', 'category', 'requester', 'urgency'] },
-      { name: 'Aprobaciones', title: 'Nueva aprobación', fields: ['title', 'requester', 'category', 'costOrImpact'] },
-      { name: 'Plazos', title: 'Nuevo plazo', fields: ['title', 'relatedEntity', 'targetDate'] },
-      { name: 'Seguimiento de procesos', title: 'Nuevo proceso', fields: ['title', 'category', 'responsible'] },
-    ];
-
-    for (const module of modules) {
-      const navButton = [...compiled.querySelectorAll<HTMLButtonElement>('.nav-link')]
-        .find((button) => button.textContent?.includes(module.name));
-      navButton?.click();
-      fixture.detectChanges();
-      compiled.querySelector<HTMLButtonElement>('.module-heading .primary-button')?.click();
-      fixture.detectChanges();
-
-      expect(compiled.querySelector('#create-title')?.textContent?.trim()).toBe(module.title);
-      for (const field of module.fields) {
-        expect(compiled.querySelector(`[name="${field}"]`)).not.toBeNull();
-      }
-
-      compiled.querySelector<HTMLButtonElement>('.create-dialog .icon-button')?.click();
-      fixture.detectChanges();
-    }
-  });
-
-  it('should approve items in the approvals list', async () => {
-    const fixture = TestBed.createComponent(App);
-    await fixture.whenStable();
-    const compiled = fixture.nativeElement as HTMLElement;
-
-    const firstApproveBtn = compiled.querySelector<HTMLButtonElement>('.btn-approve');
-    expect(firstApproveBtn).not.toBeNull();
-
-    firstApproveBtn?.click();
-    fixture.detectChanges();
-
-    expect(compiled.textContent).toContain('Aprobado');
-  });
-
-  it('should cycle task status', async () => {
-    const fixture = TestBed.createComponent(App);
-    await fixture.whenStable();
-    const compiled = fixture.nativeElement as HTMLElement;
-
-    const cycleBtn = compiled.querySelector<HTMLButtonElement>('.btn-cycle');
-    expect(cycleBtn).not.toBeNull();
-
-    // Initial first task is 'En curso' -> cycles to 'En revisión'
-    cycleBtn?.click();
-    fixture.detectChanges();
-
-    expect(compiled.textContent).toContain('En revisión');
   });
 });
